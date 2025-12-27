@@ -33,17 +33,120 @@ url.py rom django.contrib import admin from django.urls import path from bmiapp 
 urlpatterns = [ path('admin/', admin.site.urls), path('', views.calculate_bmi, name='calculate_bmi'), ]
 views.py from django.shortcuts import render
 def calculate_bmi(request): bmi = None # Default value
-```if request.method == "POST":
-    height = float(request.POST.get("height"))
-    weight = float(request.POST.get("weight"))
-    bmi = weight / (height * height)
+```
+math.html
 
-    # Print to server console for debugging
-    print("Height:", height)
-    print("Weight:", weight)
-    print("BMI calculated:", bmi)
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Area of Rectangle</title>
 
-return render(request, "bmiapp/template.html", {"BMI": bmi})
+    <style>
+        body {
+            font-size: 20px;
+            background-color: blue;
+        }
+
+        .formelt {
+            color: orange;
+            text-align: center;
+            margin-top: 7px;
+            margin-bottom: 6px;
+        }
+
+        h1 {
+            color: rgb(255, 0, 179);
+            text-align: center;
+            padding-top: 20px;
+        }
+
+        .box {
+            background-color: white;
+            width: 400px;
+            margin: auto;
+            padding: 20px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="edge">
+        <div class="box">
+
+            <h1>Area of a Rectangle</h1>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="formelt">
+                    Length :
+                    <input type="text" name="length" value="{{ l }}">
+                    (in m)
+                </div>
+
+                <div class="formelt">
+                    Breadth :
+                    <input type="text" name="breadth" value="{{ b }}">
+                    (in m)
+                </div>
+
+                <div class="formelt">
+                    <input type="submit" value="Calculate">
+                </div>
+
+                <div class="formelt">
+                    Area :
+                    <input type="text" name="area" value="{{ area }}" readonly>
+                    m<sup>2</sup>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</body>
+</html>
+
+views.py
+
+from django.shortcuts import render
+
+def rectarea(request):
+    context = {}
+    context['area'] = "0"
+    context['l'] = "0"
+    context['b'] = "0"
+
+    if request.method == 'POST':
+        print("POST method is used")
+        l = request.POST.get('length', '')
+        b = request.POST.get('breadth', '')
+
+        print('request =', request)
+        print('Length =', l)
+        print('Breadth =', b)
+
+        area = int(l) * int(b)
+
+        context['area'] = area
+        context['l'] = l
+        context['b'] = b
+
+        print('Area =', area)
+
+    return render(request, 'mathapp/math.html', context)
+
+urls.py
+
+from django.contrib import admin
+from django.urls import path
+from mathapp import views
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('areaofrectangle/', views.rectarea, name="areaofrectangle"),
+    path('', views.rectarea, name="areaofrectangleroot"),
+]
 ```
 web.html
 <title>BMI Calculator</title>
